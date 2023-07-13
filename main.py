@@ -51,8 +51,8 @@ async def on_ready():
     except Exception as e:
         logging.exception(e)
     try:
-        #salty_id = '869924385916592179'
-        salty_id = int('620952967566196776')
+        #salty_id = int('620952967566196776') #sup3r
+        salty_id = int('869924385916592179') #salty
         global server 
         server = bot.get_guild(salty_id)
         if not server:
@@ -61,10 +61,9 @@ async def on_ready():
         logging.exception(e)
 
 @bot.tree.command()
-async def submit(ctx, link: str, ign: str, town: str, war_type: str, role: str, comments: str, test: bool):
+async def submit(ctx, link: str, ign: str, town: str, war_type: str, role: str, comments: str):
     """
-    Method to handle the /submit command.
-    Takes the information from the user and posts the VoD in the correct channel.
+    Please fill out the information as requested to submit your VOD to salty.
     """
     logger.info(f'/submit command received from {ctx.user.name} with arguments: {link}, {town}, {war_type}, {role}')
         
@@ -77,39 +76,31 @@ async def submit(ctx, link: str, ign: str, town: str, war_type: str, role: str, 
     if not is_valid_town(town):
         logging.info(f" {ctx.user.name} provided an invalid town")
         await ctx.channel.send("Invalid town.")
-    if not is_valid_role(role):
-        logging.info(f" {ctx.user.name} provided an invalid role")
-        valid_roles = ['healer', 'dex', 'assassin', 'medium bruiser', 'heavy bruiser', 'VG+IG', 'fire mage', 'tank']
-        await ctx.channel.send(f"Invalid role. Valid roles are {valid_roles}")
-    if war_type not in ['attack', 'defence']:
+    if war_type.lower() not in ['attack', 'offence', 'defence']:
         logging.info(f" {ctx.user.name} provided an invalid war type")
         await ctx.channel.send("Invalid type of war. Please choose attack or defence.")
     if not is_valid_link(link):
         logging.info(f" {ctx.user.name} provided an invalid link")
         await ctx.channel.send("The link you provided isn't valid.")
 
-    # Get the correct channel to send to
-    if test:
-        channel_id = int('620952967566196778')
-        logger.info(f"The channel ID is {channel_id}")
-    elif channel_id is None:
-        logger.info('No channel assigned for this role.')
-        return 'No channel assigned for this role.'
-    else:
-        channel_id = get_channel_for_role(role)
+
+    channel_id = int('1128945668023660654') #salty
+    #channel_id= int('620952967566196778') #sup3r
+    channel = server.get_channel(int(channel_id))
+    logging.info(f"the channel is {channel}")
     
     logger.info("Creating the embed")
     # Create embed
-    embed = discord.Embed(title=f'{ign}({ctx.user.name}) submitted a video', colour=discord.Color.green())
+    embed = discord.Embed(title=f'{ign} ({ctx.user.name}) submitted a video', colour=discord.Color.green())
     embed.set_thumbnail(url=user.display_avatar.url)
-    embed.add_field(name='Summary', value=link, inline=False)
+    embed.add_field(name='VOD link', value=link, inline=False)
     embed.add_field(name='Town', value=town, inline=False)
     embed.add_field(name='War Type', value=war_type, inline=False)
     embed.add_field(name='Role', value=role, inline=False)
     embed.add_field(name='Comments', value=comments, inline=False)
 
     # Send embed to channel
-    channel = server.get_channel(int(channel_id))
+    #channel = server.get_channel(int(channel_id))
     print(f"sending the embed")
     await channel.send(embed=embed)
 
@@ -131,7 +122,7 @@ async def submit(ctx, link: str, ign: str, town: str, war_type: str, role: str, 
     
 
     logger.info('Video submitted successfully.')
-    await ctx.channel.send("Thank you for successfully submitting your vod for the war.")
+    await ctx.response.send_message("Thank you for successfully submitting your vod for the war.")
     return
 
 @bot.event
