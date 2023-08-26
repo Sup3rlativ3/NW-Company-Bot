@@ -2,6 +2,7 @@ import re
 import logging
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 
@@ -82,3 +83,44 @@ async def can_send_message(bot, channel_id):
     else:
         print("The bot cannot send messages in this channel.")
         return False
+    
+def parse_date(date_input):
+    """
+    Attempts to parse the input date string using predefined formats.
+    Returns a string in the format 'YYYY-MM-DDTHH:MM:SS.Z' if a valid format is found.
+    Otherwise, returns the input string as is.
+    If a datetime object is provided as input, it's returned in the format 'YYYY-MM-DDTHH:MM:SS.Z'.
+    """
+    if isinstance(date_input, datetime):
+        return date_input.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    
+    formats = [
+        '%Y-%m-%d %H:%M',  # '2023-08-16 14:30'
+        '%Y/%m/%d %H:%M',  # '2023/08/16 14:30'
+        '%d/%m/%Y %H:%M',  # '16/08/2023 14:30'
+        '%d-%m-%Y %H:%M',  # '16-08-2023 14:30'
+        '%Y-%m-%d',  # '2023-08-16'
+        '%Y/%m/%d',  # '2023/08/16'
+        '%d/%m/%Y',  # '16/08/2023'
+        '%d-%m-%Y',  # '16-08-2023'
+    ]
+    for fmt in formats:
+        try:
+            parsed_date = datetime.strptime(date_input, fmt)
+            return parsed_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        except ValueError:
+            continue
+    return date_input
+
+def split_into_chunks(s, chunk_size=2000):
+    """
+    Splits a string into chunks of a given size.
+
+    Parameters:
+    - s (str): The string to split.
+    - chunk_size (int): The maximum size for each chunk. Default is 2000.
+
+    Returns:
+    - list[str]: A list of string chunks.
+    """
+    return [s[i:i+chunk_size] for i in range(0, len(s), chunk_size)]
