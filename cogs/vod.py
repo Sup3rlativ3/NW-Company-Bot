@@ -19,7 +19,7 @@ class vod(commands.Cog):
         self.bot = bot
 
         # Load environment variables
-        load_dotenv()
+        #load_dotenv()
         AZURE_CONNECTION_STRING = os.getenv('AZURE_CONNECTION_STRING')
 
         # Check if environment variables are set

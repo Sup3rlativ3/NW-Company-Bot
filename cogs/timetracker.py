@@ -21,7 +21,6 @@ class timeTracker(commands.Cog):
         self.bot = bot
 
         # Load environment variables
-        load_dotenv()
         AZURE_CONNECTION_STRING = os.getenv('AZURE_CONNECTION_STRING')
 
         # Check if environment variables are set
@@ -42,7 +41,7 @@ class timeTracker(commands.Cog):
 
         logger = logging.getLogger('discord_bot')
 
-        myfilter = f"PartitionKey eq '{str(ctx.user.id)}'"
+        myfilter = f"PartitionKey eq '{str(ctx.guild.id)}' and userid eq '{str(ctx.user.id)}'"
         entities = self.entries_table.query_entities(myfilter)
         for entity in entities:
             if 'clock_out_time' not in entity:
@@ -51,10 +50,11 @@ class timeTracker(commands.Cog):
 
         try:
             write_time = self.entries_table.create_entity({
-                'PartitionKey': str(ctx.user.id),
+                'PartitionKey': str(ctx.guild.id),
                 'RowKey': str(uuid.uuid4()),
                 'tag': tag,
                 'username': str(ctx.user.display_name),
+                'userid': str(ctx.user.id),
                 'servername': str(ctx.guild.name),
                 'serverid': str(ctx.guild.id),
                 'clock_in_time': timestamp  
@@ -77,7 +77,7 @@ class timeTracker(commands.Cog):
         Clock out of time tracking.
         """
         timestamp = datetime.utcnow().astimezone(timezone.utc)
-        myfilter = f"PartitionKey eq '{str(ctx.user.id)}'"
+        myfilter = f"PartitionKey eq '{str(ctx.guild.id)}' and userid eq '{str(ctx.user.id)}"
         entities = self.entries_table.query_entities(myfilter)
         for entity in entities:
             if 'clock_out_time' not in entity:
@@ -118,13 +118,13 @@ class timeTracker(commands.Cog):
     @discord.app_commands.check(check_manager_perms)
     async def get_user_time(self, ctx, user: discord.Member, csv_output: bool = False):
         user_id = str(user.id)
-        myfilter = f"PartitionKey eq '{user_id}'"
+        myfilter = f"PartitionKey eq '{ctx.guild.id}' and userid eq '{user_id}'"
         entities = self.entries_table.query_entities(myfilter)
 
         if csv_output:
             # Create a CSV in-memory text stream
             csv_output_io = io.StringIO()
-            fields = ['PartitionKey', 'RowKey', 'username', 'clock_in_time', 'clock_out_time', 'tag', 'minutes']
+            fields = ['PartitionKey', 'RowKey', 'username', 'userid', 'clock_in_time', 'clock_out_time', 'tag', 'minutes']
             csv_writer = csv.DictWriter(csv_output_io, fields)
             csv_writer.writeheader()
 
@@ -142,7 +142,7 @@ class timeTracker(commands.Cog):
             # Send the entities as text or embed (customize as needed)
             response = ""
             for data in entities:
-                response += f"**Clock-in:** {data['clock_in_time']}, **Clock-out:** {data.get('clock_out_time', 'N/A')}, **Tags:** {data.get('tag', 'No Tag')}, **Minutes:** {data['minutes']}\n"
+                response += f"**Entry ID:** {data['RowKey']}, **Clock-in:** {data['clock_in_time']}, **Clock-out:** {data.get('clock_out_time', 'N/A')}, **Tags:** {data.get('tag', 'No Tag')}, **Minutes:** {data['minutes']}\n"
 
             await ctx.response.send_message(f"{response}")
 
@@ -156,25 +156,25 @@ class timeTracker(commands.Cog):
 
         # Validate parsed dates
         if not start_date or not end_date:
-            await ctx.response.send_message("The date format is either invalid or not recognised, please try again.")
+            await ctx.response.send_message("The date format is either invalid or not recognised, please try again.", ephemeral=True)
             return
         if end_date <= start_date:
-            await ctx.response.send_message("The end time is before the start time, please try again.")
+            await ctx.response.send_message("The end time is before the start time, please try again.", ephemeral=True)
             return
 
-        myfilter = f"clock_in_time gt datetime'{start_date}' and clock_out_time lt datetime'{end_date}' and serverid eq '{str(ctx.guild.id)}'"
+        myfilter = f"PartitionKey eq '{str(ctx.guild.id)}' and clock_in_time gt datetime'{start_date}' and clock_out_time lt datetime'{end_date}'"
         entities = self.entries_table.query_entities(myfilter)
 
         if csv_output:
             # Create a CSV in-memory text stream
             csv_output_io = io.StringIO()
-            fields = ['PartitionKey', 'RowKey', 'username', 'clock_in_time', 'clock_out_time', 'tag', 'minutes']
+            fields = ['PartitionKey', 'RowKey', 'username', 'userid', 'clock_in_time', 'clock_out_time', 'tag', 'minutes']
             csv_writer = csv.DictWriter(csv_output_io, fields)
             csv_writer.writeheader()
 
             # Write the filtered entities to the CSV
             for entity in entities:
-                entity['tag'] = entity['tag'].replace(',', '')
+                entity['tag'] = entity.get('tag', '').replace(',', '')
                 csv_writer.writerow({field: entity[field] for field in fields})
 
             # Reset the in-memory text stream position
@@ -205,12 +205,15 @@ class timeTracker(commands.Cog):
         # Get the current time in UTC
         timestamp = datetime.utcnow().astimezone(timezone.utc)
 
+        logger = logging.getLogger('discord_bot')
+
         # Query all entities without applying a filter
-        myfilter = f"clock_in_time ne '' and serverid eq '{str(ctx.guild.id)}'"
+        myfilter = f"PartitionKey eq '{str(ctx.guild.id)}' and clock_in_time ne ''"
         entities = self.entries_table.query_entities(myfilter)
         count_updated = 0
 
         entrieslist = ""
+        batch_update = []
         
         # Iterate through the entities and update them
         for entity in entities:
@@ -233,16 +236,49 @@ class timeTracker(commands.Cog):
                 elif minutes == 0:
                     time_added += f"0 minutes"
 
-                self.entries_table.update_entity(entity=entity)
+                #self.entries_table.update_entity(entity=entity)
+                batch_update.append(('update', entity))
                 count_updated += 1
 
-                user = await self.bot.fetch_user(int(entity['PartitionKey']))
+                user = await self.bot.fetch_user(int(entity['userid']))
 
                 entrieslist += f"{user.mention} has clocked out adding {time_added}.\n"
+
+        if batch_update:
+            try:
+                self.entries_table.submit_transaction(batch_update)
+            except Exception as e:
+                logger.error("Batch update failed: %s", str(e))
+                await ctx.response.send_message("Something went wrong please contact Sup3rlativ3", ephemeral=True)
 
         # Send a response with the number of updated entries
         entrieslist += f"Force clocked out {count_updated} entries."
         await ctx.response.send_message(entrieslist)
+
+    @discord.app_commands.command(name="adjust_time_entry", description="Adjust a specific time entry by a certain amount in minutes. RESTRICTED")
+    @discord.app_commands.check(check_manager_perms)
+    async def adjust_time_entry(self, ctx, entry_id: str, minutes: int):
+        """
+        Adjust a specific time entry by a certain amount in minutes.
+        Find the ID by running /get_user_time.
+        """
+        myfilter = f"PartitionKey eq '{ctx.guild.id}' and RowKey eq '{entry_id}'"
+        entities = self.entries_table.query_entities(myfilter)
+
+        entity_list = [e for e in entities]
+
+        if len(entity_list) > 1:
+            await ctx.response.send_message("Too many entries, please contact Sup3rlativ3", ephemeral=True)
+            return
+        if len(entity_list) == 0:
+            await ctx.response.send_message("No entry found with the given ID", ephemeral=True)
+            return
+        
+        entity = entity_list[0]
+        
+        entity['minutes'] = int(entity['minutes']) + minutes
+        self.entries_table.update_entity(entity)
+        await ctx.response.send_message(f"You have added {minutes} to {entity['username']}'s entry bringing it to a total of {entity['minutes']}", ephemeral=True)
 
 
 async def setup(bot):
