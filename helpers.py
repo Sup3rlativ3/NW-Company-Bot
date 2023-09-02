@@ -6,9 +6,9 @@ from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 
-def is_valid_link(link):
+def is_valid_link(url):
     """
-    Verify if a link is valid based on a regular expression.
+    Verify if a link is valid based on regular expressions.
     
     Parameters:
     link (str): The URL to verify.
@@ -16,9 +16,19 @@ def is_valid_link(link):
     Returns:
     bool: True if the URL is valid, False otherwise.
     """
-    regex = r"(http:|https:)?(\/\/)?(www\.)?(youtube.com|youtu.be|twitch.tv)\/(watch|embed|live|videos)?(\?v=|\/)?(\S+)?"
-    pattern = re.compile(regex)
-    return bool(pattern.match(link))
+    patterns = {
+        "ytShorts": r"^https://youtu\.be/([a-zA-Z0-9_-]{11})$",
+        "youtube": r"^https://(www\.)?youtube\.com/(watch\?v=|live/)([a-zA-Z0-9_-]+)$",
+        "twitch": r"^https://(www\.)?twitch\.tv/videos/([0-9]+)$",
+        "insightsgg": r"^https://insights\.gg/dashboard/video/([a-zA-Z0-9]+)(/replay)?$"
+    }
+    
+    # Check if the URL matches any of the patterns
+    for platform, pattern in patterns.items():
+        if re.fullmatch(pattern, url):
+            return True
+    
+    return False
 
 def is_valid_town(town) -> bool:
     valid_towns = ['brightwood', 'brimstone sands', 'cutlass keys', 'ebonscale reach', 
@@ -91,6 +101,8 @@ def parse_date(date_input):
     Otherwise, returns the input string as is.
     If a datetime object is provided as input, it's returned in the format 'YYYY-MM-DDTHH:MM:SS.Z'.
     """
+    if date_input == None:
+        return None
     if isinstance(date_input, datetime):
         return date_input.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
     

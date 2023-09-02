@@ -38,8 +38,7 @@ class vod(commands.Cog):
         Please fill out the information as requested to submit your VOD to Clappin.
         """
         try:
-            clappin_id = int('620952967566196776') # Clappin
-            global server 
+            clappin_id = int('1137045813424562216') # Clappin 
             server = self.bot.get_guild(clappin_id)
             if not server:
                     logger.info("I'm not in a server with that ID.")
