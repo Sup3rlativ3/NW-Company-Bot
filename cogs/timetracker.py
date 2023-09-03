@@ -77,7 +77,7 @@ class timeTracker(commands.Cog):
         Clock out of time tracking.
         """
         timestamp = datetime.utcnow().astimezone(timezone.utc)
-        myfilter = f"PartitionKey eq '{str(ctx.guild.id)}' and userid eq '{str(ctx.user.id)}"
+        myfilter = f"PartitionKey eq '{str(ctx.guild.id)}' and userid eq '{str(ctx.user.id)}'"
         entities = self.entries_table.query_entities(myfilter)
         for entity in entities:
             if 'clock_out_time' not in entity:
