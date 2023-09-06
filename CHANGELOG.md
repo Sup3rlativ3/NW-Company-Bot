@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v1.3.1 (2023-09-06)
+* Updated the regex used for validating youtu.be domain links and associated tests.
+
 ## v1.3.0 (2023-09-02)
 * Fixed an issue with exporting time entries using the /get_time_range command.
 * Added the command /adjust_time_entry
