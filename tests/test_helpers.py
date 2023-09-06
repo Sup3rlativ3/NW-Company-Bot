@@ -4,26 +4,35 @@ from ..helpers import *
 
 # Test for is_valid_link
 @pytest.mark.parametrize("link, expected", [
-    ("https://youtu.be/sKpP5STqZXY", True),
-    ("https://www.youtu.be/sKpP5STqZXY", False),
-    ("https://youtu.be/v=sKpP5STqZXY", False),
-    ("https://youtu.be/watch?v=sKpP5STqZXY", False),
-    ("https://www.youtu.be/watch?v=sKpP5STqZXY", False),
-    ("https://www.youtube.com/watch?v=sKpP5STqZXY", True),
-    ("https://youtube.com/watch?v=sKpP5STqZXY", True),
-    ("https://www.youtube.com/live/--fwVoTCX84", True),
-    ("https://youtube.com/live/--fwVoTCX84", True),
-    ("https://www.youtube.com/v=--fwVoTCX84", False),
-    ("https://www.youtube.com/--fwVoTCX84", False),
-    ("https://www.twitch.tv/videos/1901068824", True),
-    ("https://twitch.tv/videos/1912936673", True),
-    ("https://www.twitch.tv/1901068824", False),
-    ("https://insights.gg/dashboard/video/69kJcnA5XkmYDeE2teUPC3/replay", True),
-    ("https://insights.gg/dashboard/video/69kJcnA5XkmYDeE2teUPC3", True),
+    # insights.gg
     ("https://insights.gg/video/69kJcnA5XkmYDeE2teUPC3/replay", False),
     ("https://insights.gg/dashboard/69kJcnA5XkmYDeE2teUPC3/replay", False),
     ("https://insights.gg/dashboard/69kJcnA5XkmYDeE2teUPC3", False),
+    ("https://insights.gg/dashboard/video/69kJcnA5XkmYDeE2teUPC3/replay", True),
+    ("https://insights.gg/dashboard/video/69kJcnA5XkmYDeE2teUPC3", True),
+
+    # twitch.tv
+    ("https://www.twitch.tv/1912936673", False),
+    ("https://www.twitch.tv/videos/1912936673", True),
+    ("https://twitch.tv/videos/1912936673", True),
+
+    # youtu.be
+    ("https://www.youtu.be/sKpP5STqZXY", False),
+    ("https://youtu.be/v=sKpP5STqZXY", False),
+    ("https://www.youtu.be/watch?v=sKpP5STqZXY", False),
+    ("https://youtu.be/sKpP5STqZXY", True),
+    ("https://youtu.be/watch?v=sKpP5STqZXY", True),
+    ("https://youtu.be/Gc6gtCvWUAA?si=SZ6fKP8NI3B9uvqk", True),
+
+    # youtube.com
+    ("https://www.youtube.com/v=--fwVoTCX84", False),
+    ("https://www.youtube.com/--fwVoTCX84", False),
+    ("https://www.youtube.com/watch?v=sKpP5STqZXY", True),
+    ("https://youtube.com/watch?v=sKpP5STqZXY", True),
+    ("https://www.youtube.com/live/--fwVoTCX84", True),
+    ("https://youtube.com/live/--fwVoTCX84", True)
 ])
+
 
 def test_is_valid_link(link, expected):
     assert is_valid_link(link) == expected
