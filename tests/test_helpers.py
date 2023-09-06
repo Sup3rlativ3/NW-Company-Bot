@@ -30,7 +30,8 @@ from ..helpers import *
     ("https://www.youtube.com/watch?v=sKpP5STqZXY", True),
     ("https://youtube.com/watch?v=sKpP5STqZXY", True),
     ("https://www.youtube.com/live/--fwVoTCX84", True),
-    ("https://youtube.com/live/--fwVoTCX84", True)
+    ("https://youtube.com/live/--fwVoTCX84", True),
+    ("https://www.youtube.com/watch?v=iiBxnC9d9ds&ab", True)
 ])
 
 

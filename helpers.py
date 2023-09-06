@@ -18,7 +18,7 @@ def is_valid_link(url):
     """
     patterns = {
         "ytShorts": r"^https:\/\/youtu\.be\/(watch\?v=)?([a-zA-Z0-9_-]{11})(\?[=a-zA-Z0-9_\-]{19,40})?$",
-        "youtube": r"^https://(www\.)?youtube\.com/(watch\?v=|live/)([a-zA-Z0-9_-]+)$",
+        "youtube": r"^https://(www\.)?youtube\.com/(watch\?v=|live/)([a-zA-Z0-9_\-&]+)$",
         "twitch": r"^https://(www\.)?twitch\.tv/videos/([0-9]+)$",
         "insightsgg": r"^https://insights\.gg/dashboard/video/([a-zA-Z0-9]+)(/replay)?$"
     }
