@@ -3,6 +3,7 @@ import os
 import uuid
 import logging
 from urllib.parse import urlparse
+import json
 
 # Import third-party libraries
 import discord
@@ -30,6 +31,10 @@ class vod(commands.Cog):
         # Azure setup
         self.vods_table = TableClient.from_connection_string(AZURE_CONNECTION_STRING, 'vods')
 
+        # config import
+        f = open('.config')
+        self.config = json.load(f)
+
         
 
     @discord.app_commands.command(name="submit", description="Submit a vod for a clappin cheeks war.")
@@ -38,10 +43,11 @@ class vod(commands.Cog):
         Please fill out the information as requested to submit your VOD to Clappin.
         """
         try:
-            clappin_id = int('1137045813424562216') # Clappin 
-            server = self.bot.get_guild(clappin_id)
+            server_id = int(self.config.get("server"))
+            print(F"Server ID is {server_id}")
+            server = self.bot.get_guild(server_id)
             if not server:
-                    logger.info("I'm not in a server with that ID.")
+                    logger.warning("I'm not in a server with that ID.")
         except Exception as e:
             logging.exception(e)
 
@@ -66,24 +72,14 @@ class vod(commands.Cog):
             logging.info(f" {ctx.user.name} provided an invalid link")
             await ctx.channel.send("The link you provided isn't valid.")
             return
-        if role.lower() not in ['bruiser','mage','healer','tank','dex','assassin','sup3r']:
+        if not is_valid_role(role.lower()):
             logging.info(f"{ctx.user.name} provided an invalid role.")
-            await ctx.channel.send("The role you provided is invalid. Valid choices are bruiser,mage,healer,tank,dex, or assassin.")
+            await ctx.channel.send(f"The role you provided is invalid. Valid choices are {(config['role_channels']).keys()}.")
             return
         
         else:
-            match role.lower():
-                case "bruiser" | "tank":
-                    channel_id = int('1137592332590514227')
-                case "healer":
-                    channel_id = int('1137592356263182376')
-                case "dex":
-                    channel_id = int('1137592377079500860')
-                case "assassin":
-                    channel_id = int('1137592437095804968')
-                case "mage":
-                    channel_id = int('1137592511653752832')
-
+            roles = config["role_channels"]
+            channel_id = int(roles[role])
             channel = server.get_channel(int(channel_id))
             logging.info(f"the channel is {channel}")
         

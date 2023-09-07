@@ -5,6 +5,7 @@ import logging
 from datetime import datetime, timezone
 import io
 import csv
+import json
 
 # Import third-party libraries
 import discord
@@ -30,6 +31,10 @@ class timeTracker(commands.Cog):
 
         # Azure setup
         self.entries_table = TableClient.from_connection_string(AZURE_CONNECTION_STRING, 'entries')
+        
+        # config import
+        f = open('.config')
+        self.config = json.load(f)
 
 
     @discord.app_commands.command(name="clockin", description="Clock in for an approved event.")
@@ -106,7 +111,12 @@ class timeTracker(commands.Cog):
                 await ctx.response.send_message(f"{ctx.user.display_name} has clocked out adding {time_added}.")
 
     async def check_manager_perms(ctx):
-            role = discord.utils.get(ctx.guild.roles, name="Support Team")
+            # config import
+            f = open('.config')
+            config = json.load(f)
+            admin_role = config["permissions"]["admin"]
+            print(F" the admin role is '{admin_role}'")
+            role = discord.utils.get(ctx.guild.roles, name=admin_role)
             if role in ctx.user.roles:
                 return True
             elif role not in ctx.user.roles:

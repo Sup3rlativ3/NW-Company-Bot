@@ -3,10 +3,15 @@ import logging
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 from datetime import datetime
+import json
 
 logging.basicConfig(level=logging.INFO)
 
-def is_valid_link(url):
+# config import
+f = open('.config')
+config = json.load(f)
+
+def is_valid_link(url) -> bool:
     """
     Verify if a link is valid based on regular expressions.
     
@@ -16,12 +21,8 @@ def is_valid_link(url):
     Returns:
     bool: True if the URL is valid, False otherwise.
     """
-    patterns = {
-        "ytShorts": r"^https:\/\/youtu\.be\/(watch\?v=)?([a-zA-Z0-9_-]{11})(\?[=a-zA-Z0-9_\-]{19,40})?$",
-        "youtube": r"^https://(www\.)?youtube\.com/(watch\?v=|live/)([a-zA-Z0-9_\-&]+)$",
-        "twitch": r"^https://(www\.)?twitch\.tv/videos/([0-9]+)$",
-        "insightsgg": r"^https://insights\.gg/dashboard/video/([a-zA-Z0-9]+)(/replay)?$"
-    }
+
+    patterns = config["patterns"]
     
     # Check if the URL matches any of the patterns
     for platform, pattern in patterns.items():
@@ -31,31 +32,9 @@ def is_valid_link(url):
     return False
 
 def is_valid_town(town) -> bool:
-    valid_towns = ['brightwood', 'brimstone sands', 'cutlass keys', 'ebonscale reach', 
-               'everfall', 'monarch’s bluffs', 'mourningdale', 
-               'reekwater', 'restless shore', 'weaver’s fen', 'windsward']
 
-    town_shorthands = {
-        'bw': 'brightwood',
-        'bs': 'brimstone sands',
-        'brim': 'brimstone sands',
-        'ck': 'cutlass keys',
-        'cutless': 'cutlass keys',
-        'ebon': 'ebonscale reach',
-        'ef': 'everfall',
-        'mb': 'monarch’s bluffs',
-        'monarchs': 'monarch’s bluffs',
-        'md': 'mourningdale',
-        'rw': 'reekwater',
-        'reek': 'reekwater',
-        'rs': 'restless shore',
-        'restless': 'restless shore',
-        'wf': 'weaver’s fen',
-        'weavers': 'weaver’s fen',
-        'ww': 'windsward',
-        'winny': 'windsward',
-        'winnie': 'windsward',
-    }
+    valid_towns = config['valid_towns']
+    town_shorthands = config['town_shorthands']
 
     # if the town name is a known shorthand, replace it with the full town name
     town = town.lower()
@@ -69,7 +48,9 @@ def is_valid_town(town) -> bool:
         return False
 
 def is_valid_role(role) -> bool:
-    valid_roles = ['healer', 'dex', 'assassin', 'medium bruiser', 'heavy bruiser', 'VG+IG', 'fire mage', 'tank']
+    roles = config["role_channels"]
+    valid_roles = roles.keys()
+    #valid_roles = ['healer', 'dex', 'assassin', 'medium bruiser', 'heavy bruiser', 'VG+IG', 'fire mage', 'tank']
     closest_match = process.extractOne(role, valid_roles, scorer=fuzz.ratio)
     if closest_match and closest_match[1] > 60:
         return True

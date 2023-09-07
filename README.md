@@ -11,6 +11,7 @@
   - [/Get_User_Time](#get_user_time)
   - [/Adjust_Time_Entry](#adjust_time_entry)
   - [/Get_Time_Range](#gettimerange)
+- [Setup](#setup)
 
 ## Overview
 
@@ -213,3 +214,7 @@ Get a list of time entries betwwen two dates.
 ![Get Time Range Output](./docs/images/get_time_range_output.png)
 
 ---
+
+## Setup
+
+For setup instructions please look at the [Technical Documation](./docs/Technical.md).

@@ -31,7 +31,8 @@ from ..helpers import *
     ("https://youtube.com/watch?v=sKpP5STqZXY", True),
     ("https://www.youtube.com/live/--fwVoTCX84", True),
     ("https://youtube.com/live/--fwVoTCX84", True),
-    ("https://www.youtube.com/watch?v=iiBxnC9d9ds&ab", True)
+    ("https://www.youtube.com/watch?v=iiBxnC9d9ds&ab", True),
+    ("https://www.youtube.com/watch?v=iiBxnC9d9ds&ab_channel=Tr%E1%BA%A7nQuangAnh", True)
 ])
 
 
