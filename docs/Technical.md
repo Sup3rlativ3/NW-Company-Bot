@@ -42,6 +42,8 @@ The project uses a .env file to manage environment variables:
 - `DISCORD_TOKEN`: Your Discord Bot Token.
 - `AZURE_CONNECTION_STRING`: Azure Tables connection string.
 
+Make a copy of the .env.template and rename it to just .env. Populate the variables with the correct values.
+
 ---
 
 ## Code Structure
