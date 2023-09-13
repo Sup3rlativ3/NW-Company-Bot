@@ -69,8 +69,8 @@ def is_valid_role(role) -> bool:
     roles = config["role_channels"]
     valid_roles = roles.keys()
     #valid_roles = ['healer', 'dex', 'assassin', 'medium bruiser', 'heavy bruiser', 'VG+IG', 'fire mage', 'tank']
-    closest_match = process.extractOne(role, valid_roles, scorer=fuzz.ratio)
-    if closest_match and closest_match[1] > 60:
+    closest_match = process.extractOne(role.lower(), valid_roles, scorer=fuzz.ratio)
+    if closest_match.lower() and closest_match[1].lower() > 60:
         return True
     else:
         return False
