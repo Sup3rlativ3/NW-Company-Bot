@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v1.4.1 (2023-09-13)
+
+* Added the commands start_war and end_war.
+* Added permission restrictions to the commands start_war and end_war.
+
 ## v1.3.1 (2023-09-06)
 
 * Updated the regex used for validating youtu.be domain links and associated tests.

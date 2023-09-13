@@ -10,7 +10,9 @@
   - [/Force_ClockOut](#force_clockout)
   - [/Get_User_Time](#get_user_time)
   - [/Adjust_Time_Entry](#adjust_time_entry)
-  - [/Get_Time_Range](#gettimerange)
+  - [/Get_Time_Range](#get_time_range)
+  - [/Start_war](#start_war)
+  - [/Stop_War](#end_war)
 - [Setup](#setup)
 
 ## Overview
@@ -212,6 +214,56 @@ Get a list of time entries betwwen two dates.
 ![Get Time Range Commmand](./docs/images/get_time_range_example.png)
 
 ![Get Time Range Output](./docs/images/get_time_range_output.png)
+
+---
+
+### /Start_War
+
+**Description:**  
+Tells the bot to join a voice channel and start calling respawns. The bot will know the current respawn even if you start it late.
+
+**Usage:**  
+
+``` Ruby
+/start_war [voice_channel]
+```
+
+**Parameters:**
+
+- **voice_channel [Required]**: Choose the voice channel you would like the bot to join.
+
+**Examples:**
+
+``` Ruby
+/start_war voice_channel: War Room
+```
+
+![Start War Commmand](./docs/images/start_war_example.png)
+
+![Start War Output](./docs/images/start_war_output.png)
+
+---
+
+### /Stop_War
+
+**Description:**  
+Tell the bot to leave the voice channel.
+
+**Usage:**  
+
+``` Ruby
+/stop_war
+```
+
+**Examples:**
+
+``` Ruby
+/stop_war
+```
+
+![End War Commmand](./docs/images/end_war_example.png)
+
+![End War Output](./docs/images/end_war_output.png)
 
 ---
 

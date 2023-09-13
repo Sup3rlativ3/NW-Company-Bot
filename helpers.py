@@ -5,11 +5,29 @@ from fuzzywuzzy import process
 from datetime import datetime
 import json
 
+# Import third-party libraries
+import discord
+from discord.ext import commands, tasks
+
 logging.basicConfig(level=logging.INFO)
 
 # config import
 f = open('.config')
 config = json.load(f)
+
+async def check_manager_perms(ctx):
+        # config import
+        f = open('.config')
+        config = json.load(f)
+        admin_role = config["permissions"]["admin"]
+        print(F" the admin role is '{admin_role}'")
+        role = discord.utils.get(ctx.guild.roles, name=admin_role)
+        if role in ctx.user.roles:
+            return True
+        elif role not in ctx.user.roles:
+            await ctx.response.send_message("Sorry you do not have the correct permissions.", ephemeral=True)
+        else:
+            await ctx.response.send_message("Sorry something went wrong.", ephemeral=True)
 
 def is_valid_link(url) -> bool:
     """

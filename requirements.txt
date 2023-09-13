@@ -1,6 +1,7 @@
-discord.py
+discord.py[voice]
 python-dotenv
 azure-core
 azure-data-tables
 fuzzywuzzy
 pytest
+ffmpeg-python
