@@ -38,7 +38,7 @@ class vod(commands.Cog):
         
 
     @discord.app_commands.command(name="submit", description="Submit a vod for a clappin cheeks war.")
-    async def submit(self, ctx, link: str, ign: str, town: str, war_type: str, role: str, comments: str):
+    async def submit(self, ctx, link: str, ign: str, town: str, war_type: str, role: str, comments: str, public: bool = False):
         """
         Please fill out the information as requested to submit your VOD to Clappin.
         """
@@ -93,10 +93,29 @@ class vod(commands.Cog):
         embed.add_field(name='Role', value=role, inline=False)
         embed.add_field(name='Comments', value=comments, inline=False)
 
-        # Send embed to channel
-        print(f"sending the embed")
         try:
-            thread = await channel.create_thread(name=f"{ign}'s {town} {war_type} VOD", type=discord.ChannelType.public_thread)
+            if not public:
+                thread = await channel.create_thread(name=f"{ign}'s {town} {war_type} VOD", type=discord.ChannelType.private_thread,invitable=True)
+                admin_role = self.config["permissions"]["admin"]
+                guild = ctx.guild
+                for arole in guild.roles:
+                    if arole.name.lower() == admin_role.lower():
+                        print(f"The ID for the role '{admin_role}' is: {arole.id}")
+                        admin_role = ctx.guild.get_role(arole.id)
+                        break
+                    
+                print(f"@{admin_role.id}")
+
+                for user in admin_role.members:
+                    print(f"{user}")
+                    #user = await self.bot.fetch_user(user.id)
+                    print(f"Adding {user} with id {user.id}")
+                    await thread.add_user(user)
+            else:
+                thread = await channel.create_thread(name=f"{ign}'s {town} {war_type} VOD", type=discord.ChannelType.public_thread,invitable=True)
+            
+            # Send embed to channel
+            print(f"sending the embed")
             await thread.send(embed=embed)
         except discord.Forbidden:
             logging.error("Bot does not have the required permissions.")

@@ -31,7 +31,7 @@ Submit a war VOD to the bot. The bot will post it to the preconfigured channel a
 **Usage:**  
 
 ``` Ruby
-/Submit [link] [ign] [town] [war_type] [role] [comments]
+/Submit [link] [ign] [town] [war_type] [role] [comments] [public]
 ```
 
 **Parameters:**
@@ -42,6 +42,7 @@ Submit a war VOD to the bot. The bot will post it to the preconfigured channel a
 - **War_Type [Required]**: Was this an Attack or Defence war.
 - **Role [Required]**: Your role/class in the war.
 - **Comments [Required]**: Any comments you would like to attach to the replay for people reviewing.
+- **Public [Optional]**: If marked as false the thread created will only be available to the admin role defined the .config file. If nothing is specified the thread will be public.
 
 **Examples:**
 
