@@ -79,7 +79,7 @@ class vod(commands.Cog):
         
         else:
             roles = config["role_channels"]
-            channel_id = int(roles[role])
+            channel_id = int(roles[role.lower()])
             channel = server.get_channel(int(channel_id))
             logging.info(f"the channel is {channel}")
         
