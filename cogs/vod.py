@@ -4,6 +4,7 @@ import uuid
 import logging
 from urllib.parse import urlparse
 import json
+import asyncio
 
 # Import third-party libraries
 import discord
@@ -11,6 +12,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from azure.core.exceptions import AzureError
 from azure.data.tables import TableClient
+
 
 # Import local libraries
 from helpers import *
@@ -41,6 +43,8 @@ class vod(commands.Cog):
         """
         Please fill out the information as requested to submit your VOD to Clappin.
         """
+        await ctx.response.defer(ephemeral=False, thinking=True)
+        
         try:
             server_id = int(self.config.get("server"))
             print(F"Server ID is {server_id}")
@@ -92,6 +96,7 @@ class vod(commands.Cog):
         embed.add_field(name='Role', value=role, inline=False)
         embed.add_field(name='Comments', value=comments, inline=False)
 
+        
         try:
             if public == False:
                 server_id = int(self.config.get("server"))
@@ -112,9 +117,11 @@ class vod(commands.Cog):
                     print(f"{user}")
                     print(f"Adding {user} with id {user.id}")
                     await thread.add_user(user)
+                    asyncio.sleep(2)
             else:
                 thread = await channel.create_thread(name=f"{ign}'s {town} {war_type} VOD", type=discord.ChannelType.public_thread)
             
+            message = await ctx.followup.send(content="Processing...")
             # Send embed to channel
             print(f"sending the embed")
             await thread.send(embed=embed)
@@ -141,7 +148,7 @@ class vod(commands.Cog):
         
 
         logger.info('Video submitted successfully.')
-        await ctx.response.send_message("Thank you for successfully submitting your vod for the war.")
+        await ctx.followup.edit_message(message.id, content="Thank you for successfully submitting your vod for the war.")
         return
 
 async def setup(bot):
