@@ -3,6 +3,7 @@
 ## 1.4.5 (2023-09-19)
 
 * Fix for direct private submissions using the /submit failing to resolve the admin group.
+* Adjusted respawn time to be more accurate in the /start_war command
 
 ## 1.4.4 (2023-09-18)
 
