@@ -198,6 +198,7 @@ class timeTracker(commands.Cog):
         Force clock out of all entries without a clock_out_time.
         Optionally filter by a specific tag.
         """
+        await ctx.response.defer(ephemeral=False, thinking=True)
         # Get the current time in UTC
         timestamp = datetime.utcnow().astimezone(timezone.utc)
 
@@ -246,10 +247,11 @@ class timeTracker(commands.Cog):
             except Exception as e:
                 logger.error("Batch update failed: %s", str(e))
                 await ctx.response.send_message("Something went wrong please contact Sup3rlativ3", ephemeral=True)
+        
 
         # Send a response with the number of updated entries
         entrieslist += f"Force clocked out {count_updated} entries."
-        await ctx.response.send_message(entrieslist)
+        await ctx.followup.send(content=entrieslist)
 
     @discord.app_commands.command(name="adjust_time_entry", description="Adjust a specific time entry by a certain amount in minutes. RESTRICTED")
     @discord.app_commands.check(check_manager_perms)
