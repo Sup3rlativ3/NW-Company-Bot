@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.4.5 (2023-09-19)
+
+* Fix for direct private submissions using the /submit failing to resolve the admin group.
+
+## 1.4.4 (2023-09-18)
+
+* Added the public parameter to the /Submit command to allow private submissions.
+
 ## v1.4.1 (2023-09-13)
 
 * Added the commands start_war and end_war.

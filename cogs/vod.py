@@ -20,7 +20,6 @@ class vod(commands.Cog):
         self.bot = bot
 
         # Load environment variables
-        #load_dotenv()
         AZURE_CONNECTION_STRING = os.getenv('AZURE_CONNECTION_STRING')
 
         # Check if environment variables are set
@@ -35,6 +34,10 @@ class vod(commands.Cog):
         f = open('.config')
         self.config = json.load(f)
 
+        server_id = int(self.config.get("server"))
+        print(F"Server ID is {server_id}")
+        self.server = self.bot.get_guild(server_id)
+
         
 
     @discord.app_commands.command(name="submit", description="Submit a vod for a clappin cheeks war.")
@@ -43,10 +46,7 @@ class vod(commands.Cog):
         Please fill out the information as requested to submit your VOD to Clappin.
         """
         try:
-            server_id = int(self.config.get("server"))
-            print(F"Server ID is {server_id}")
-            server = self.bot.get_guild(server_id)
-            if not server:
+            if not self.server:
                     logger.warning("I'm not in a server with that ID.")
         except Exception as e:
             logging.exception(e)
@@ -94,10 +94,10 @@ class vod(commands.Cog):
         embed.add_field(name='Comments', value=comments, inline=False)
 
         try:
-            if not public:
+            if not public == False:
                 thread = await channel.create_thread(name=f"{ign}'s {town} {war_type} VOD", type=discord.ChannelType.private_thread,invitable=True)
                 admin_role = self.config["permissions"]["admin"]
-                guild = ctx.guild
+                guild = self.server
                 for arole in guild.roles:
                     if arole.name.lower() == admin_role.lower():
                         print(f"The ID for the role '{admin_role}' is: {arole.id}")
@@ -108,11 +108,10 @@ class vod(commands.Cog):
 
                 for user in admin_role.members:
                     print(f"{user}")
-                    #user = await self.bot.fetch_user(user.id)
                     print(f"Adding {user} with id {user.id}")
                     await thread.add_user(user)
             else:
-                thread = await channel.create_thread(name=f"{ign}'s {town} {war_type} VOD", type=discord.ChannelType.public_thread,invitable=True)
+                thread = await channel.create_thread(name=f"{ign}'s {town} {war_type} VOD", type=discord.ChannelType.public_thread)
             
             # Send embed to channel
             print(f"sending the embed")
@@ -121,8 +120,6 @@ class vod(commands.Cog):
             logging.error("Bot does not have the required permissions.")
         except discord.HTTPException as e:
             logging.error(f"Failed to create thread: {e}")
-
-        #await channel.send(embed=embed)
 
         # Store in Azure Table storage
         try:
