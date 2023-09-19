@@ -34,10 +34,6 @@ class vod(commands.Cog):
         f = open('.config')
         self.config = json.load(f)
 
-        server_id = int(self.config.get("server"))
-        print(F"Server ID is {server_id}")
-        self.server = self.bot.get_guild(server_id)
-
         
 
     @discord.app_commands.command(name="submit", description="Submit a vod for a clappin cheeks war.")
@@ -46,6 +42,9 @@ class vod(commands.Cog):
         Please fill out the information as requested to submit your VOD to Clappin.
         """
         try:
+            server_id = int(self.config.get("server"))
+            print(F"Server ID is {server_id}")
+            self.server = self.bot.get_guild(server_id)
             if not self.server:
                     logger.warning("I'm not in a server with that ID.")
         except Exception as e:
@@ -80,7 +79,7 @@ class vod(commands.Cog):
         else:
             roles = config["role_channels"]
             channel_id = int(roles[role.lower()])
-            channel = server.get_channel(int(channel_id))
+            channel = self.server.get_channel(int(channel_id))
             logging.info(f"the channel is {channel}")
         
         logger.info("Creating the embed")
@@ -94,14 +93,17 @@ class vod(commands.Cog):
         embed.add_field(name='Comments', value=comments, inline=False)
 
         try:
-            if not public == False:
+            if public == False:
+                server_id = int(self.config.get("server"))
+                print(F"Server ID is {server_id}")
+                self.server = self.bot.get_guild(server_id)
                 thread = await channel.create_thread(name=f"{ign}'s {town} {war_type} VOD", type=discord.ChannelType.private_thread,invitable=True)
                 admin_role = self.config["permissions"]["admin"]
                 guild = self.server
                 for arole in guild.roles:
                     if arole.name.lower() == admin_role.lower():
                         print(f"The ID for the role '{admin_role}' is: {arole.id}")
-                        admin_role = ctx.guild.get_role(arole.id)
+                        admin_role = guild.get_role(arole.id)
                         break
                     
                 print(f"@{admin_role.id}")
