@@ -2,7 +2,8 @@
 
 ## 1.4.7 (2023-09-22)
 
-* Changed the default value for the ```Public``` parameter of the ```/Submit``` command to ```True```
+* Changed the default value for the ```Public``` parameter of the ```/Submit``` command to ```True```.
+* Adjusted the regex for detecting twitch.tv links to allow for a timestamp.
 
 ## 1.4.6 (2023-09-19)
 

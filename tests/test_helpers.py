@@ -15,6 +15,7 @@ from ..helpers import *
     ("https://www.twitch.tv/1912936673", False),
     ("https://www.twitch.tv/videos/1912936673", True),
     ("https://twitch.tv/videos/1912936673", True),
+    ("https://www.twitch.tv/videos/1930381469?t=0h14m43s",True),
 
     # youtu.be
     ("https://www.youtu.be/sKpP5STqZXY", False),
