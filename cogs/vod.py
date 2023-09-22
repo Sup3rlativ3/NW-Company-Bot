@@ -39,7 +39,7 @@ class vod(commands.Cog):
         
 
     @discord.app_commands.command(name="submit", description="Submit a vod for a clappin cheeks war.")
-    async def submit(self, ctx, link: str, ign: str, town: str, war_type: str, role: str, comments: str, public: bool = False):
+    async def submit(self, ctx, link: str, ign: str, town: str, war_type: str, role: str, comments: str, public: bool = True):
         """
         Please fill out the information as requested to submit your VOD to Clappin.
         """
