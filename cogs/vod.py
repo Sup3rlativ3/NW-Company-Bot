@@ -65,20 +65,20 @@ class vod(commands.Cog):
         # Validate inputs
         if not is_valid_town(town):
             logging.info(f" {ctx.user.name} provided an invalid town")
-            await ctx.followup.edit_message(message.id, content="Invalid town.")
+            await ctx.followup.send(content="Invalid town.")
             return
         if war_type.lower() not in ['attack', 'offence', 'defence']:
             logging.info(f" {ctx.user.name} provided an invalid war type")
-            await ctx.followup.edit_message(message.id, content="Invalid type of war. Please choose attack or defence.")
+            await ctx.followup.send(content="Invalid type of war. Please choose attack or defence.")
             return
         if not is_valid_link(link):
             logging.info(f" {ctx.user.name} provided an invalid link")
-            await ctx.followup.edit_message(message.id, content="The link you provided isn't valid.")
+            await ctx.followup.send(content="The link you provided isn't valid.")
             return
         if not is_valid_role(role.lower()):
             print("error")
             logging.info(f"{ctx.user.name} provided an invalid role.")
-            await ctx.followup.edit_message(message.id, content=f"The role you provided is invalid. Valid choices are {(config['role_channels']).keys()}.")
+            await ctx.followup.send(content=f"The role you provided is invalid. Valid choices are {(config['role_channels']).keys()}.")
             return
         
         else:
